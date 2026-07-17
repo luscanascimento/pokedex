@@ -1,0 +1,62 @@
+<a
+  class="card"
+  [routerLink]="['/pokemon', pokemon().id]"
+  [style.--card-type]="'var(--type-' + primaryType() + ')'"
+  [attr.aria-label]="'View details for ' + (pokemon().name | displayName)"
+>
+  <div class="card__glow" aria-hidden="true"></div>
+  <header class="card__top">
+    <span class="card__id">{{ pokemon().id | dexNumber }}</span>
+    <div class="card__actions">
+      <button
+        type="button"
+        class="icon-btn"
+        [class.icon-btn--active]="isFavorite()"
+        (click)="onFavorite($event)"
+        [attr.aria-pressed]="isFavorite()"
+        [attr.aria-label]="(isFavorite() ? 'Remove ' : 'Add ') + (pokemon().name | displayName) + ' to favorites'"
+      >
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <path
+            d="M12 21s-7.5-4.8-10-9.2C.3 8.6 1.7 5 5 5c2 0 3.2 1.1 4 2.3C9.8 6.1 11 5 13 5c3.3 0 4.7 3.6 3 6.8C19.5 16.2 12 21 12 21z"
+            [attr.fill]="isFavorite() ? 'currentColor' : 'none'"
+            stroke="currentColor"
+            stroke-width="1.6"
+          />
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="icon-btn"
+        [class.icon-btn--active]="inTeam()"
+        (click)="onTeam($event)"
+        [attr.aria-pressed]="inTeam()"
+        [attr.aria-label]="(inTeam() ? 'Remove ' : 'Add ') + (pokemon().name | displayName) + ' from team'"
+      >
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          @if (inTeam()) {
+            <path d="M5 12l4 4 10-10" fill="none" stroke="currentColor" stroke-width="2" />
+          } @else {
+            <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" />
+          }
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="card__sprite">
+    <div class="card__sprite-halo" aria-hidden="true"></div>
+    <pa-sprite-image [src]="pokemon().sprite" [alt]="(pokemon().name | displayName) + ' artwork'" />
+  </div>
+
+  <footer class="card__meta">
+    <h3 class="card__name">{{ pokemon().name | displayName }}</h3>
+    <div class="card__types">
+      @for (t of pokemon().types; track t) {
+        <pa-type-badge [type]="t" size="sm" />
+      } @empty {
+        <span class="card__types-skel" aria-hidden="true"></span>
+      }
+    </div>
+  </footer>
+</a>

@@ -1,0 +1,90 @@
+@let def = defensive();
+@let off = offensive();
+
+<div class="eff">
+  <section class="eff__col" aria-label="Defensive matchups">
+    <h3 class="eff__heading">
+      <span class="eff__heading-icon eff__heading-icon--def" aria-hidden="true"></span>
+      Takes damage from
+    </h3>
+
+    @if (def.weaknesses.length) {
+      @for (bucket of def.weaknesses; track bucket.multiplier) {
+        <div class="eff__row eff__row--weak">
+          <span class="eff__mult">{{ formatMultiplier(bucket.multiplier) }}</span>
+          <div class="eff__types">
+            @for (t of bucket.types; track t) {
+              <pa-type-badge [type]="t" size="sm" />
+            }
+          </div>
+        </div>
+      }
+    }
+    @if (def.resistances.length) {
+      @for (bucket of def.resistances; track bucket.multiplier) {
+        <div class="eff__row eff__row--resist">
+          <span class="eff__mult">{{ formatMultiplier(bucket.multiplier) }}</span>
+          <div class="eff__types">
+            @for (t of bucket.types; track t) {
+              <pa-type-badge [type]="t" size="sm" />
+            }
+          </div>
+        </div>
+      }
+    }
+    @if (def.immunities.length) {
+      <div class="eff__row eff__row--immune">
+        <span class="eff__mult">0×</span>
+        <div class="eff__types">
+          @for (t of def.immunities; track t) {
+            <pa-type-badge [type]="t" size="sm" />
+          }
+        </div>
+      </div>
+    }
+    @if (!def.weaknesses.length && !def.resistances.length && !def.immunities.length) {
+      <p class="eff__flat">Perfectly neutral — takes 1× from every type.</p>
+    }
+  </section>
+
+  <section class="eff__col" aria-label="Offensive coverage">
+    <h3 class="eff__heading">
+      <span class="eff__heading-icon eff__heading-icon--off" aria-hidden="true"></span>
+      Deals damage to
+    </h3>
+
+    @if (off.superEffective.length) {
+      <div class="eff__row eff__row--weak">
+        <span class="eff__mult">2×</span>
+        <div class="eff__types">
+          @for (t of off.superEffective; track t) {
+            <pa-type-badge [type]="t" size="sm" />
+          }
+        </div>
+      </div>
+    }
+    @if (off.notVeryEffective.length) {
+      <div class="eff__row eff__row--resist">
+        <span class="eff__mult">½×</span>
+        <div class="eff__types">
+          @for (t of off.notVeryEffective; track t) {
+            <pa-type-badge [type]="t" size="sm" />
+          }
+        </div>
+      </div>
+    }
+    @if (off.noEffect.length) {
+      <div class="eff__row eff__row--immune">
+        <span class="eff__mult">0×</span>
+        <div class="eff__types">
+          @for (t of off.noEffect; track t) {
+            <pa-type-badge [type]="t" size="sm" />
+          }
+        </div>
+      </div>
+    }
+    @if (!off.superEffective.length && !off.notVeryEffective.length && !off.noEffect.length) {
+      <p class="eff__flat">Hits every type for exactly 1×.</p>
+    }
+  </section>
+</div>

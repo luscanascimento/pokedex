@@ -1,0 +1,227 @@
+<a class="back-link" routerLink="/dex">
+  <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+    <path d="M19 12H5M11 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" />
+  </svg>
+  Back to Pokedex
+</a>
+
+@switch (state()) {
+  @case ('loading') {
+    <pa-loader label="Scanning Pokemon" />
+  }
+  @case ('error') {
+    <pa-empty-state
+      title="Pokemon not found"
+      message="We couldn't find that entry in the dex. It may not exist yet."
+    >
+      <a class="pa-btn pa-btn--primary" routerLink="/dex">Browse the dex</a>
+    </pa-empty-state>
+  }
+  @case ('ready') {
+    @if (detail(); as d) {
+      <article
+        class="mon"
+        [style.--mon-type]="'var(--type-' + d.types[0] + ')'"
+        [style.--mon-type-2]="'var(--type-' + (d.types.length > 1 ? d.types[1] : d.types[0]) + ')'"
+      >
+        <!-- Hero -->
+        <section class="mon__hero">
+          <div class="mon__hero-bg" aria-hidden="true">
+            <span class="mon__watermark">{{ d.id | dexNumber }}</span>
+          </div>
+
+          <div class="mon__stage">
+            <div class="mon__stage-glow" aria-hidden="true"></div>
+            <pa-sprite-image
+              [src]="currentSprite()"
+              [alt]="(d.name | displayName) + (shiny() ? ' shiny' : '') + ' artwork'"
+            />
+            <button
+              type="button"
+              class="shiny-toggle"
+              [class.shiny-toggle--on]="shiny()"
+              (click)="toggleShiny()"
+              [attr.aria-pressed]="shiny()"
+            >
+              <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                <path
+                  d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"
+                  fill="currentColor"
+                />
+              </svg>
+              {{ shiny() ? 'Shiny' : 'Normal' }}
+            </button>
+          </div>
+
+          <div class="mon__intro">
+            <p class="eyebrow">{{ d.id | dexNumber }} · {{ generationLabel() }}</p>
+            <h1 class="mon__name">{{ d.name | displayName }}</h1>
+            <div class="mon__types">
+              @for (t of d.types; track t) {
+                <pa-type-badge [type]="t" />
+              }
+            </div>
+            <p class="mon__flavor">{{ d.flavorText }}</p>
+
+            <div class="mon__actions">
+              <button
+                type="button"
+                class="pa-btn"
+                [class.pa-btn--primary]="isFavorite()"
+                (click)="toggleFavorite()"
+                [attr.aria-pressed]="isFavorite()"
+              >
+                {{ isFavorite() ? '★ Favorited' : '☆ Favorite' }}
+              </button>
+              <button
+                type="button"
+                class="pa-btn"
+                [class.pa-btn--primary]="inTeam()"
+                (click)="toggleTeam()"
+                [attr.aria-pressed]="inTeam()"
+              >
+                {{ inTeam() ? '✓ In team' : '+ Add to team' }}
+              </button>
+            </div>
+
+            <dl class="mon__vitals">
+              <div><dt>Height</dt><dd>{{ (d.height / 10).toFixed(1) }} m</dd></div>
+              <div><dt>Weight</dt><dd>{{ (d.weight / 10).toFixed(1) }} kg</dd></div>
+              <div><dt>Base XP</dt><dd>{{ d.baseExperience ?? '—' }}</dd></div>
+            </dl>
+          </div>
+        </section>
+
+        <div class="mon__grid">
+          <!-- Stats -->
+          <section class="panel" aria-label="Base stats">
+            <header class="panel__head">
+              <h2 class="panel__title">Base stats</h2>
+              <span class="panel__badge">Total {{ d.statTotal }}</span>
+            </header>
+            <ul class="stats">
+              @for (s of d.stats; track s.name; let i = $index) {
+                <li class="stat">
+                  <span class="stat__label">{{ s.label }}</span>
+                  <span class="stat__value">{{ s.value }}</span>
+                  <div class="stat__track">
+                    <div
+                      class="stat__fill"
+                      [class]="'stat__fill--' + statTier(s.value)"
+                      [style.width.%]="statPercent(s.value)"
+                      [style.animation-delay]="i * 70 + 'ms'"
+                    ></div>
+                  </div>
+                </li>
+              }
+            </ul>
+          </section>
+
+          <!-- Abilities -->
+          <section class="panel" aria-label="Abilities">
+            <header class="panel__head">
+              <h2 class="panel__title">Abilities</h2>
+            </header>
+            <ul class="abilities">
+              @for (a of d.abilities; track a.name) {
+                <li class="ability">
+                  <span class="ability__name">{{ a.name | displayName }}</span>
+                  @if (a.hidden) {
+                    <span class="ability__tag">Hidden</span>
+                  }
+                </li>
+              }
+            </ul>
+
+            <h3 class="panel__subtitle">Sample moves</h3>
+            <ul class="moves">
+              @for (m of d.moves; track m.name) {
+                <li class="move">
+                  <span class="move__name">{{ m.name | displayName }}</span>
+                  @if (m.level > 0) {
+                    <span class="move__lv">Lv {{ m.level }}</span>
+                  } @else {
+                    <span class="move__lv">—</span>
+                  }
+                </li>
+              } @empty {
+                <li class="move move--empty">No level-up moves listed.</li>
+              }
+            </ul>
+          </section>
+
+          <!-- Effectiveness -->
+          <section class="panel panel--wide" aria-label="Type effectiveness">
+            <header class="panel__head">
+              <h2 class="panel__title">Type effectiveness</h2>
+              <a class="panel__link" routerLink="/matchup">Open in Matchup Lab →</a>
+            </header>
+            <pa-effectiveness-panel [types]="d.types" />
+          </section>
+
+          <!-- Evolution -->
+          <section class="panel panel--wide" aria-label="Evolution chain">
+            <header class="panel__head">
+              <h2 class="panel__title">Evolution chain</h2>
+            </header>
+            @switch (evoState()) {
+              @case ('loading') {
+                <pa-loader label="Tracing lineage" />
+              }
+              @case ('error') {
+                <p class="evo-error">Couldn't load the evolution chain.</p>
+              }
+              @case ('ready') {
+                @if (evolutions().length > 1) {
+                  <ol class="evo">
+                    @for (stage of evolutions(); track stage.id; let last = $last) {
+                      <li class="evo__item">
+                        <a
+                          class="evo__mon"
+                          [routerLink]="['/pokemon', stage.id]"
+                          [style.--evo-type]="'var(--type-' + stage.types[0] + ')'"
+                        >
+                          <div class="evo__sprite">
+                            <pa-sprite-image
+                              [src]="stage.sprite"
+                              [alt]="stage.name | displayName"
+                            />
+                          </div>
+                          <span class="evo__name">{{ stage.name | displayName }}</span>
+                          <div class="evo__types">
+                            @for (t of stage.types; track t) {
+                              <pa-type-badge [type]="t" size="sm" />
+                            }
+                          </div>
+                        </a>
+                        @if (!last) {
+                          <div class="evo__arrow" aria-hidden="true">
+                            @if (evolutions()[$index + 1].trigger) {
+                              <span class="evo__trigger">{{
+                                evolutions()[$index + 1].trigger
+                              }}</span>
+                            }
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                              <path
+                                d="M5 12h14M13 5l7 7-7 7"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                              />
+                            </svg>
+                          </div>
+                        }
+                      </li>
+                    }
+                  </ol>
+                } @else {
+                  <p class="evo-single">This Pokemon does not evolve.</p>
+                }
+              }
+            }
+          </section>
+        </div>
+      </article>
+    }
+  }
+}

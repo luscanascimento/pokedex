@@ -1,0 +1,69 @@
+:host {
+  display: block;
+}
+
+.ptr {
+  position: relative;
+  /* Pull the content down by the tracked gesture distance. */
+  transform: translateY(var(--ptr-pull, 0px));
+}
+.ptr--pulling:not(.ptr--refreshing) {
+  transition: none;
+}
+.ptr:not(.ptr--pulling) {
+  transition: transform 0.3s var(--ease-out);
+}
+.ptr--refreshing {
+  transition: transform 0.3s var(--ease-out);
+}
+
+.ptr__indicator {
+  position: absolute;
+  top: calc(var(--ptr-pull, 0px) * -1 - 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  opacity: clamp(0, calc(var(--ptr-pull, 0) / 60), 1);
+}
+
+.ptr__spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--accent);
+  transition: transform 0.2s var(--ease-out);
+}
+.ptr--armed .ptr__spinner {
+  transform: rotate(180deg);
+  border-top-color: var(--accent-2);
+}
+.ptr--refreshing .ptr__spinner {
+  animation: ptr-spin 0.7s linear infinite;
+}
+
+@keyframes ptr-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ptr--refreshing .ptr__spinner {
+    animation-duration: 1.2s;
+  }
+}
+
+/* Desktop / mouse: hide the indicator entirely — pull-to-refresh is touch-only. */
+@media (hover: hover) and (pointer: fine) {
+  .ptr__indicator {
+    display: none;
+  }
+}

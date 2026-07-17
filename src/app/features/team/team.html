@@ -1,0 +1,260 @@
+<header class="team-head">
+  <div>
+    <p class="eyebrow">Differential 02</p>
+    <h1 class="team-head__title">Team Builder</h1>
+    <p class="team-head__lede">
+      Assemble up to six Pokemon. Poke Arena automatically analyzes the squad's shared weaknesses and
+      coverage across all 18 attacking types. Your team is saved on this device.
+    </p>
+  </div>
+  <div class="team-head__meta">
+    <span class="team-head__count">{{ count() }}/{{ maxTeam }}</span>
+    @if (count() > 0) {
+      <button type="button" class="pa-btn pa-btn--ghost" (click)="clear()">Clear team</button>
+    }
+  </div>
+</header>
+
+<!-- Roster -->
+<section class="roster" aria-label="Team roster">
+  @for (m of slots().filled; track m.id) {
+    <article class="slot slot--filled" [style.--slot-type]="'var(--type-' + m.types[0] + ')'">
+      <button
+        type="button"
+        class="slot__remove"
+        (click)="remove(m.id)"
+        [attr.aria-label]="'Remove ' + (m.name | displayName) + ' from team'"
+      >
+        ✕
+      </button>
+      <a class="slot__link" [routerLink]="['/pokemon', m.id]">
+        <div class="slot__sprite">
+          <pa-sprite-image [src]="m.sprite" [alt]="m.name | displayName" />
+        </div>
+        <span class="slot__id">{{ m.id | dexNumber }}</span>
+        <span class="slot__name">{{ m.name | displayName }}</span>
+        <div class="slot__types">
+          @for (t of m.types; track t) {
+            <pa-type-badge [type]="t" size="sm" />
+          }
+        </div>
+      </a>
+    </article>
+  }
+  @for (e of slots().empty; track $index) {
+    <div class="slot slot--empty" aria-hidden="true">
+      <span class="slot__plus">+</span>
+      <span class="slot__hint">Empty slot</span>
+    </div>
+  }
+</section>
+
+<!-- Add search -->
+@if (!isFull()) {
+  <section class="add" aria-label="Add a Pokemon">
+    <div class="add__search">
+      <input
+        type="search"
+        class="add__input"
+        placeholder="Add a Pokemon by name or number…"
+        [value]="query()"
+        (input)="onSearch($any($event.target).value)"
+        aria-label="Search a Pokemon to add"
+      />
+      @if (suggestions().length) {
+        <ul class="suggestions" role="listbox">
+          @for (s of suggestions(); track s.id) {
+            <li>
+              <button type="button" class="suggestions__item" (click)="add(s)">
+                <span class="suggestions__id">{{ s.id | dexNumber }}</span>
+                {{ s.name | displayName }}
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+    @if (adding()) {
+      <span class="add__status">Adding…</span>
+    }
+  </section>
+} @else {
+  <p class="add__full">Team is full — remove a member to swap.</p>
+}
+
+<!-- Analysis -->
+@if (count() === 0) {
+  <pa-empty-state
+    title="Your team is empty"
+    message="Search above or add Pokemon from the Pokedex to start building. The analyzer activates as soon as you add your first member."
+  >
+    <a class="pa-btn pa-btn--primary" routerLink="/dex">Browse the Pokedex</a>
+  </pa-empty-state>
+} @else {
+  <section class="analysis" aria-label="Team analysis">
+    <h2 class="analysis__title">Team weakness &amp; coverage</h2>
+
+    @if (analysis().uncovered.length) {
+      <div class="alert" role="status">
+        <strong>Unresolved threats:</strong>
+        <div class="alert__types">
+          @for (t of analysis().uncovered; track t) {
+            <pa-type-badge [type]="t" size="sm" />
+          }
+        </div>
+        <span class="alert__note">No team member resists these — they threaten the whole squad.</span>
+      </div>
+    } @else {
+      <div class="alert alert--ok" role="status">
+        <strong>Solid defense.</strong>
+        <span class="alert__note">Every threatening type is resisted by at least one member.</span>
+      </div>
+    }
+
+    <div class="analysis__grid">
+      <div class="analysis__col">
+        <h3 class="analysis__subtitle analysis__subtitle--threat">Shared weaknesses</h3>
+        @if (analysis().threats.length) {
+          <ul class="threat-list">
+            @for (row of analysis().threats; track row.type) {
+              <li class="threat" [attr.data-level]="threatLevel(row.weakCount)">
+                <pa-type-badge [type]="row.type" size="sm" />
+                <div class="threat__bar" aria-hidden="true">
+                  <span [style.width.%]="(row.weakCount / count()) * 100"></span>
+                </div>
+                <span class="threat__count">{{ row.weakCount }} weak</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="analysis__none">No shared weaknesses. Excellent balance.</p>
+        }
+      </div>
+
+      <div class="analysis__col">
+        <h3 class="analysis__subtitle analysis__subtitle--resist">Resistances &amp; coverage</h3>
+        @if (analysis().resisted.length) {
+          <ul class="threat-list">
+            @for (row of analysis().resisted; track row.type) {
+              <li class="threat threat--resist">
+                <pa-type-badge [type]="row.type" size="sm" />
+                <div class="threat__bar threat__bar--resist" aria-hidden="true">
+                  <span [style.width.%]="(row.resistCount / count()) * 100"></span>
+                </div>
+                <span class="threat__count">{{ row.resistCount }} resist</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="analysis__none">This team resists nothing yet.</p>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Region readiness — Gyms & League gauntlet -->
+  <section class="gauntlet" aria-label="Region readiness">
+    <div class="gauntlet__head">
+      <p class="eyebrow">Gauntlet</p>
+      <h2 class="gauntlet__title">Region readiness — Gyms &amp; League</h2>
+      <p class="gauntlet__lede">
+        How your squad fares against every gym leader, the Elite Four and the Champion across the
+        nine regions. The score blends <strong>offense</strong> (can you hit their Pokemon
+        super-effectively) and <strong>defense</strong> (do their Pokemon threaten your team).
+      </p>
+      <ul class="legend" aria-hidden="true">
+        <li class="legend__item legend__item--covered">Ringed green — you counter it</li>
+        <li class="legend__item legend__item--threat">Ringed red — it threatens you</li>
+      </ul>
+    </div>
+
+    <div class="verdicts">
+      @if (strongest(); as s) {
+        <article class="verdict verdict--strong">
+          <span class="verdict__tag">Strongest matchup</span>
+          <span class="verdict__region">{{ s.region }}</span>
+          <span class="verdict__version">{{ s.version }}</span>
+          <span class="verdict__score">{{ s.score | number: '1.0-0' }}<small>/100</small></span>
+        </article>
+      }
+      @if (weakest(); as w) {
+        <article class="verdict verdict--weak">
+          <span class="verdict__tag">Weakest matchup</span>
+          <span class="verdict__region">{{ w.region }}</span>
+          <span class="verdict__version">{{ w.version }}</span>
+          <span class="verdict__score">{{ w.score | number: '1.0-0' }}<small>/100</small></span>
+        </article>
+      }
+    </div>
+
+    <ul class="regions">
+      @for (r of regions(); track r.gen; let i = $index) {
+        <li class="region" [attr.data-level]="scoreLevel(r.score)">
+          <button
+            type="button"
+            class="region__row"
+            (click)="toggleRegion(r.gen)"
+            [attr.aria-expanded]="isExpanded(r.gen)"
+          >
+            <span class="region__rank">#{{ i + 1 }}</span>
+            <span class="region__id">
+              <span class="region__name">{{ r.region }}</span>
+              <span class="region__version">{{ r.version }}</span>
+            </span>
+            <span class="region__bar" aria-hidden="true">
+              <span [style.width.%]="r.score"></span>
+            </span>
+            <span class="region__score">{{ r.score | number: '1.0-0' }}</span>
+            <span class="region__chev" aria-hidden="true">{{ isExpanded(r.gen) ? '▾' : '▸' }}</span>
+          </button>
+
+          <div class="region__stats">
+            <span class="stat stat--off">⚔ Offense {{ r.offense | number: '1.0-0' }}%</span>
+            <span class="stat stat--def">🛡 Defense {{ r.defense | number: '1.0-0' }}%</span>
+            <span class="stat">{{ r.coveredMons }}/{{ r.totalMons }} countered</span>
+            <span class="stat stat--warn">{{ r.threatMons }} threats</span>
+            @if (r.hardestBattle; as hb) {
+              <span class="stat stat--hard">Toughest: {{ hb.leader }}</span>
+            }
+          </div>
+
+          @if (isExpanded(r.gen)) {
+            <div class="battles">
+              @if (r.notes) {
+                <p class="battles__note">{{ r.notes }}</p>
+              }
+              @for (b of r.battles; track battleKey(b)) {
+                <article class="battle" [attr.data-role]="b.role">
+                  <header class="battle__head">
+                    <span class="battle__role">{{ roleLabel(b.role) }}</span>
+                    <span class="battle__leader">{{ b.leader }}</span>
+                    @if (b.specialtyType) {
+                      <pa-type-badge [type]="b.specialtyType" size="sm" />
+                    }
+                    <span class="battle__label">{{ b.label }}</span>
+                    <span class="battle__score">{{ b.score | number: '1.0-0' }}</span>
+                  </header>
+                  <div class="battle__team">
+                    @for (m of b.team; track $index) {
+                      <div
+                        class="mon"
+                        [attr.data-covered]="m.covered"
+                        [attr.data-threat]="m.threat"
+                        [attr.title]="m.name + ' · ' + m.types.join(' / ')"
+                      >
+                        <div class="mon__sprite">
+                          <pa-sprite-image [src]="sprite(m.dexId)" [alt]="m.name" />
+                        </div>
+                        <span class="mon__name">{{ m.name }}</span>
+                      </div>
+                    }
+                  </div>
+                </article>
+              }
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  </section>
+}

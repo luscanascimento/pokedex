@@ -1,0 +1,69 @@
+<section class="hero">
+  <div class="hero__grid" aria-hidden="true"></div>
+  <div class="hero__content">
+    <p class="eyebrow hero__eyebrow">Gen I → IX · {{ dexMax }} species indexed</p>
+    <h1 class="hero__title">
+      The Pokedex,<br />
+      <span class="hero__title-accent">rebuilt for battle.</span>
+    </h1>
+    <p class="hero__lede">
+      Poke Arena is a modern Pokedex with a competitive twist. Browse every species, then dive into
+      a full type-matchup calculator and an automatic team weakness analyzer built on the complete
+      Gen VI+ type chart.
+    </p>
+    <div class="hero__cta">
+      <a class="pa-btn pa-btn--primary" routerLink="/dex">
+        Open the Pokedex
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <path d="M5 12h14M13 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" />
+        </svg>
+      </a>
+      <a class="pa-btn pa-btn--ghost" routerLink="/matchup">Try the Matchup Lab</a>
+    </div>
+
+    <dl class="hero__stats">
+      <div class="hero__stat">
+        <dt>Species</dt>
+        <dd>{{ dexMax }}</dd>
+      </div>
+      <div class="hero__stat">
+        <dt>Team slots</dt>
+        <dd>{{ teamCount() }}/6</dd>
+      </div>
+      <div class="hero__stat">
+        <dt>Favorites</dt>
+        <dd>{{ favCount() }}</dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="hero__orb" aria-hidden="true">
+    <div class="hero__orb-ring hero__orb-ring--1"></div>
+    <div class="hero__orb-ring hero__orb-ring--2"></div>
+    <div class="hero__orb-core"></div>
+    <span class="hero__spark hero__spark--a"></span>
+    <span class="hero__spark hero__spark--b"></span>
+    <span class="hero__spark hero__spark--c"></span>
+  </div>
+</section>
+
+<section class="features" aria-label="Core features">
+  @for (f of features; track f.route; let i = $index) {
+    <a
+      class="feature"
+      [routerLink]="f.route"
+      [style.--feature-accent]="f.accent"
+      [style.animation-delay]="i * 90 + 'ms'"
+    >
+      <span class="feature__num">0{{ i + 1 }}</span>
+      <p class="eyebrow feature__eyebrow">{{ f.eyebrow }}</p>
+      <h2 class="feature__title">{{ f.title }}</h2>
+      <p class="feature__copy">{{ f.copy }}</p>
+      <span class="feature__arrow" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <path d="M5 12h14M13 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" />
+        </svg>
+      </span>
+    </a>
+  }
+</section>

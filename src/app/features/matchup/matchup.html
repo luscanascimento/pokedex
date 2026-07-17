@@ -1,0 +1,127 @@
+<header class="lab-head">
+  <p class="eyebrow">Differential 01</p>
+  <h1 class="lab-head__title">Matchup Lab</h1>
+  <p class="lab-head__lede">
+    Compute full offensive and defensive type effectiveness from the complete Gen VI+ chart. Pick a
+    Pokemon, or hand-build a dual-type combination.
+  </p>
+</header>
+
+<div class="mode-switch" role="tablist" aria-label="Matchup input mode">
+  <button
+    type="button"
+    role="tab"
+    class="mode-switch__btn"
+    [class.mode-switch__btn--active]="mode() === 'types'"
+    [attr.aria-selected]="mode() === 'types'"
+    (click)="setMode('types')"
+  >
+    Type combo
+  </button>
+  <button
+    type="button"
+    role="tab"
+    class="mode-switch__btn"
+    [class.mode-switch__btn--active]="mode() === 'pokemon'"
+    [attr.aria-selected]="mode() === 'pokemon'"
+    (click)="setMode('pokemon')"
+  >
+    By Pokemon
+  </button>
+</div>
+
+<div class="lab">
+  <!-- Input column -->
+  <section class="lab__input pa-card">
+    @if (mode() === 'types') {
+      <h2 class="lab__input-title">Choose up to two types</h2>
+      <p class="lab__hint">Selecting a second type computes the dual-type defensive product.</p>
+      <div class="type-picker">
+        @for (t of allTypes; track t) {
+          <button
+            type="button"
+            class="type-picker__btn"
+            [class.type-picker__btn--active]="isSelected(t)"
+            [style.--pick-color]="'var(--type-' + t + ')'"
+            (click)="toggleType(t)"
+            [attr.aria-pressed]="isSelected(t)"
+          >
+            {{ t }}
+          </button>
+        }
+      </div>
+    } @else {
+      <h2 class="lab__input-title">Search a Pokemon</h2>
+      <div class="picker-search">
+        <input
+          type="search"
+          class="picker-search__input"
+          placeholder="e.g. charizard, gyarados…"
+          [value]="query()"
+          (input)="onSearch($any($event.target).value)"
+          aria-label="Search a Pokemon"
+        />
+        @if (suggestions().length) {
+          <ul class="suggestions" role="listbox">
+            @for (s of suggestions(); track s.id) {
+              <li>
+                <button type="button" class="suggestions__item" (click)="pick(s)">
+                  <span class="suggestions__id">{{ s.id | dexNumber }}</span>
+                  {{ s.name | displayName }}
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      @if (pickedTypesLoading()) {
+        <p class="lab__hint">Loading types…</p>
+      }
+
+      @if (picked(); as p) {
+        <div class="picked" [style.--picked-type]="'var(--type-' + p.types[0] + ')'">
+          <div class="picked__sprite">
+            <pa-sprite-image [src]="p.sprite" [alt]="p.name | displayName" />
+          </div>
+          <div class="picked__info">
+            <span class="picked__id">{{ p.id | dexNumber }}</span>
+            <span class="picked__name">{{ p.name | displayName }}</span>
+            <div class="picked__types">
+              @for (t of p.types; track t) {
+                <pa-type-badge [type]="t" size="sm" />
+              }
+            </div>
+          </div>
+          <button type="button" class="picked__clear" (click)="clearPick()" aria-label="Clear selection">
+            ✕
+          </button>
+        </div>
+      }
+    }
+  </section>
+
+  <!-- Result column -->
+  <section class="lab__result pa-card" aria-label="Effectiveness result">
+    @if (hasResult()) {
+      <div class="result-head">
+        <span class="eyebrow">Analyzing</span>
+        <div class="result-head__types">
+          @for (t of activeTypes(); track t) {
+            <pa-type-badge [type]="t" />
+          }
+        </div>
+      </div>
+      <pa-effectiveness-panel [types]="activeTypes()" />
+    } @else {
+      <div class="result-empty">
+        <div class="result-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="44" height="44">
+            <path d="M24 4l6 14 14 6-14 6-6 14-6-14-14-6 14-6z" fill="none" stroke="currentColor" stroke-width="2" />
+          </svg>
+        </div>
+        <p>Select {{ mode() === 'types' ? 'a type' : 'a Pokemon' }} to see the matchup breakdown.</p>
+      </div>
+    }
+  </section>
+</div>
