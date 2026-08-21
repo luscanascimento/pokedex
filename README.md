@@ -17,12 +17,13 @@
 
 ## Overview
 
-**Poke Arena** is a frontend-only single-page application that reimagines the Pokedex as a competitive battle terminal. It consumes the free [PokeAPI](https://pokeapi.co) (no key required) and layers on two features that go beyond a typical dex: a full **Type Matchup Calculator** and an automatic **Team Weakness Analyzer**.
+**Poke Arena** is a frontend-only single-page application that reimagines the Pokedex as a competitive battle terminal. It consumes the free [PokeAPI](https://pokeapi.co) (no key required) and layers on three features that go beyond a typical dex: **Region Readiness** (score your team against every region's gyms and league), a full **Type Matchup Calculator**, and an automatic **Team Weakness Analyzer**.
 
 It is built entirely on the modern Angular stack — standalone components, Signals for state, the new control-flow syntax, typed inputs, functional interceptors, and lazy-loaded routes — with TypeScript in **strict mode** and **zero `any`**.
 
 ## ✨ Features
 
+- **Region Readiness** — score your squad against the gym leaders, Elite Four and Champion of all **nine regions** (see the dedicated section below).
 - **Browse the full National Dex (Gen I → IX, 1025 species)** — responsive, type-colored cards with lazy-loaded artwork, skeleton shimmer, and progressive "load more" paging.
 - **Search & filter** — instant search by name or dex number, plus filter chips for **type** and **generation**.
 - **Rich detail view** — animated base-stat bars, abilities (incl. hidden), sample level-up moves, an interactive **evolution chain**, a **normal / shiny** artwork toggle, and per-Pokemon type effectiveness.
@@ -33,6 +34,33 @@ It is built entirely on the modern Angular stack — standalone components, Sign
 - **Light & dark themes**, fully responsive, keyboard-accessible with visible focus states and semantic markup.
 
 > The Matchup Lab and the Team Analyzer are the parts worth reading: both run off a hand-written, fully-typed type-effectiveness chart and pure functions, not extra API calls.
+
+## 🏅 Region Readiness — the headline feature
+
+Build a team, and Poke Arena tells you **which region you could actually beat with it**. Every one of the nine mainline regions is ranked from easiest to hardest for your current squad, right inside the Team Builder.
+
+**Curated data, not an API call.** `src/app/core/data/gym-leaders.ts` is 1422 lines of hand-compiled roster data: **109 battles** (68 gyms, 32 Elite Four members, 9 Champions) totaling **434 Pokemon**, each with its National Dex id and canonical typing. Each region is sourced from a single flagship game so the rosters are internally consistent:
+
+| Gen | Region | Source version |
+| --- | --- | --- |
+| I | Kanto | FireRed/LeafGreen |
+| II | Johto | HeartGold/SoulSilver |
+| III | Hoenn | Emerald |
+| IV | Sinnoh | Platinum |
+| V | Unova | Black 2/White 2 |
+| VI | Kalos | X/Y |
+| VII | Alola | Ultra Sun/Ultra Moon |
+| VIII | Galar | Sword/Shield |
+| IX | Paldea | Scarlet/Violet |
+
+The file header states the rosters were *"compiled and adversarially fact-checked"*, and each region carries a `notes` field recording the judgement calls — first-encounter vs rematch rosters, how version- or starter-dependent teams were resolved, structural oddities (Alola has Island Kahunas instead of gyms; Galar has no Elite Four), and era-correct typings (Kanto's note, for example, records that Mr. Mime is listed as pure Psychic because FR/LG predates the Fairy type). Those notes are rendered in the UI, so the assumptions are visible to the user instead of buried.
+
+**Scoring** (`src/app/core/services/region-readiness.service.ts`, pure functions over the same type chart):
+
+- **Offense 0–100** — the share of the battle's Pokemon that at least one of your members can hit for more than 1× with a STAB type.
+- **Defense 0–100** — the share of the battle's Pokemon whose own STAB does *not* hit at least half your squad for 2× or more.
+- **Battle score** — the mean of the two. A region's score is computed the same way over all of its Pokemon, and the region list is sorted strongest-first.
+- Each region also surfaces its **hardest battle** (lowest score), plus per-Pokemon `covered` / `threat` flags so you can see exactly which mon is the problem.
 
 ## 🚀 Getting Started
 
@@ -83,10 +111,12 @@ Poke Arena is **mobile-first** and an **installable Progressive Web App** — it
 ```
 src/app/
 ├── core/                        # App-wide singletons, no UI
-│   ├── data/                    # Type chart + generation ranges (pure data)
+│   ├── data/                    # Type chart, generation ranges, gym-leader
+│   │                            #   rosters for all 9 regions (pure data)
 │   ├── interceptors/            # Functional HTTP cache interceptor
 │   ├── models/                  # Typed domain + raw PokeAPI interfaces
 │   └── services/                # PokeApi, Favorites, Team, Matchup, Theme (signals)
+│                                #   + RegionReadiness (pure scoring)
 ├── shared/                      # Reusable, presentational building blocks
 │   ├── pipes/                   # displayName, dexNumber
 │   └── ui/                      # type-badge, sprite-image, pokemon-card,
