@@ -26,25 +26,13 @@ It is built entirely on the modern Angular stack — standalone components, Sign
 - **Browse the full National Dex (Gen I → IX, 1025 species)** — responsive, type-colored cards with lazy-loaded artwork, skeleton shimmer, and progressive "load more" paging.
 - **Search & filter** — instant search by name or dex number, plus filter chips for **type** and **generation**.
 - **Rich detail view** — animated base-stat bars, abilities (incl. hidden), sample level-up moves, an interactive **evolution chain**, a **normal / shiny** artwork toggle, and per-Pokemon type effectiveness.
-- **🧮 DIFFERENTIAL — Type Matchup Lab** — pick a Pokemon _or_ hand-build a dual-type combination and compute **offensive** and **defensive** effectiveness (weaknesses / resistances / immunities) from the complete Gen VI+ type chart.
-- **🛡️ DIFFERENTIAL — Team Builder** — assemble up to **6 Pokemon** (persisted in `localStorage`) and get **automatic squad analysis**: which attacking types threaten the whole team, which types have no defensive answer, and where your resistances stack.
+- **Type Matchup Lab** — pick a Pokemon _or_ hand-build a dual-type combination and compute **offensive** and **defensive** effectiveness (weaknesses / resistances / immunities) from the complete Gen VI+ type chart.
+- **Team Builder** — assemble up to **6 Pokemon** (persisted in `localStorage`) and get **automatic squad analysis**: which attacking types threaten the whole team, which types have no defensive answer, and where your resistances stack.
 - **Favorites** — pin any Pokemon; persisted across sessions.
 - **PWA** — installable and **offline-capable**: the Angular service worker caches the app shell, visited API data, and sprites.
 - **Light & dark themes**, fully responsive, keyboard-accessible with visible focus states and semantic markup.
 
-> The two **DIFFERENTIALS** — the Matchup Lab and the Team Analyzer — are the standout pieces: both are driven by a hand-written, fully-typed type-effectiveness chart and pure functions, not by extra API calls.
-
-## 📸 Screenshots
-
-> The images below are **placeholders** — replace them with real captures after running the app.
-
-| Home | Pokedex | Detail |
-| --- | --- | --- |
-| ![Home](./docs/screenshot-1.png) | ![Pokedex](./docs/screenshot-2.png) | ![Detail](./docs/screenshot-3.png) |
-
-| Matchup Lab | Team Builder |
-| --- | --- |
-| ![Matchup Lab](./docs/screenshot-4.png) | ![Team Builder](./docs/screenshot-5.png) |
+> The Matchup Lab and the Team Analyzer are the parts worth reading: both run off a hand-written, fully-typed type-effectiveness chart and pure functions, not extra API calls.
 
 ## 🚀 Getting Started
 
@@ -105,8 +93,8 @@ src/app/
 │                                #   effectiveness-panel, loader, empty-state
 ├── features/                    # Lazy-loaded route features
 │   ├── home/  dex/  detail/
-│   ├── matchup/                 # Differential 1 — Type Matchup Lab
-│   ├── team/                    # Differential 2 — Team Builder + analysis
+│   ├── matchup/                 # Type Matchup Lab
+│   ├── team/                    # Team Builder + squad analysis
 │   ├── favorites/  not-found/
 ├── app.ts / app.html / app.scss # Shell: header, nav, theme, PWA update toast
 ├── app.config.ts                # Providers: router, http (+cache), service worker

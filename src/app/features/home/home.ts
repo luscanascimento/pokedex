@@ -37,14 +37,14 @@ export class Home {
     },
     {
       route: '/matchup',
-      eyebrow: 'Differential',
+      eyebrow: 'Analyze',
       title: 'Matchup Lab',
       copy: 'Compute offensive and defensive type effectiveness for any Pokemon or custom type combination.',
       accent: 'var(--type-fire)',
     },
     {
       route: '/team',
-      eyebrow: 'Differential',
+      eyebrow: 'Build',
       title: 'Team Builder',
       copy: 'Assemble up to six Pokemon and get automatic weakness and coverage analysis for the whole squad.',
       accent: 'var(--type-electric)',
