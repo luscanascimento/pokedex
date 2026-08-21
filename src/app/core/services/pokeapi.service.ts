@@ -48,18 +48,24 @@ export class PokeApiService {
       this.index$ = this.http
         .get<ApiListResponse>(`${API}/pokemon?limit=${NATIONAL_DEX_MAX}&offset=0`)
         .pipe(
-          map((res) =>
-            res.results
-              .map((r) => this.idFromUrl(r.url))
-              .filter((id) => id > 0 && id <= NATIONAL_DEX_MAX)
-              .map<PokemonSummary>((id) => ({
-                id,
-                name: this.nameFromId(res.results, id),
-                types: [],
-                sprite: `${ARTWORK_BASE}/${id}.png`,
-                generation: generationForId(id),
-              })),
-          ),
+          map((res) => {
+            // One pass to build the id -> name lookup. Doing a .find() per entry
+            // was O(n^2) (~1M iterations over the 1025-species list).
+            const nameById = new Map<number, string>();
+            for (const r of res.results) {
+              const id = this.idFromUrl(r.url);
+              if (id > 0 && id <= NATIONAL_DEX_MAX) {
+                nameById.set(id, r.name);
+              }
+            }
+            return [...nameById].map<PokemonSummary>(([id, name]) => ({
+              id,
+              name,
+              types: [],
+              sprite: `${ARTWORK_BASE}/${id}.png`,
+              generation: generationForId(id),
+            }));
+          }),
           shareReplay({ bufferSize: 1, refCount: false }),
         );
     }
@@ -209,11 +215,6 @@ export class PokeApiService {
   private idFromUrl(url: string): number {
     const parts = url.split('/').filter(Boolean);
     return Number(parts[parts.length - 1]);
-  }
-
-  private nameFromId(results: { name: string; url: string }[], id: number): string {
-    const match = results.find((r) => this.idFromUrl(r.url) === id);
-    return match ? match.name : `pokemon-${id}`;
   }
 
   private titleCase(value: string): string {
