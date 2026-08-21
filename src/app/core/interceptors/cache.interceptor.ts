@@ -6,7 +6,12 @@ import { of, tap } from 'rxjs';
  * PokeAPI payloads are immutable, so caching them avoids redundant
  * round-trips and keeps navigation instant. The Angular service worker
  * layers persistent/offline caching on top in production.
+ *
+ * Capped so a long browse through the 1025 species can't grow it without bound.
+ * ponytail: plain FIFO eviction — insertion-ordered Map, oldest key out. Swap for
+ * an LRU only if profiling shows real thrashing on the hot entries.
  */
+const MAX_ENTRIES = 300;
 const store = new Map<string, HttpResponse<unknown>>();
 
 export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
@@ -22,6 +27,12 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     tap((event) => {
       if (event instanceof HttpResponse) {
+        if (store.size >= MAX_ENTRIES) {
+          const oldest = store.keys().next().value;
+          if (oldest !== undefined) {
+            store.delete(oldest);
+          }
+        }
         store.set(req.urlWithParams, event.clone());
       }
     }),
