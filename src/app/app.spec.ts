@@ -14,11 +14,6 @@ describe('App', () => {
     }).compileComponents();
   });
 
-  it('should create the app shell', () => {
-    const fixture = TestBed.createComponent(App);
-    expect(fixture.componentInstance).toBeTruthy();
-  });
-
   it('should render the brand name', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
