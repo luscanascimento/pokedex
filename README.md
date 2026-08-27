@@ -19,7 +19,7 @@
 
 **Poke Arena** is a frontend-only single-page application that reimagines the Pokedex as a competitive battle terminal. It consumes the free [PokeAPI](https://pokeapi.co) (no key required) and layers on three features that go beyond a typical dex: **Region Readiness** (score your team against every region's gyms and league), a full **Type Matchup Calculator**, and an automatic **Team Weakness Analyzer**.
 
-It is built entirely on the modern Angular stack — standalone components, Signals for state, the new control-flow syntax, typed inputs, functional interceptors, and lazy-loaded routes — with TypeScript in **strict mode** and **zero `any`**.
+It is built entirely on the modern Angular stack — standalone components, Signals for state, the new control-flow syntax, typed inputs, functional interceptors, and lazy-loaded routes — with TypeScript in **strict mode** and no `any` in the TypeScript sources (templates use `$any` in three places, to read `$event.target.value` off an input).
 
 ## ✨ Features
 
@@ -39,7 +39,7 @@ It is built entirely on the modern Angular stack — standalone components, Sign
 
 Build a team, and Poke Arena tells you **which region you could actually beat with it**. Every one of the nine mainline regions is ranked from easiest to hardest for your current squad, right inside the Team Builder.
 
-**Curated data, not an API call.** `src/app/core/data/gym-leaders.ts` is 1422 lines of hand-compiled roster data: **109 battles** (68 gyms, 32 Elite Four members, 9 Champions) totaling **428 Pokemon**, each with its National Dex id and canonical typing. Each region is sourced from a single flagship game so the rosters are internally consistent:
+**Curated data, not an API call.** `src/app/core/data/gym-leaders.ts` is 1421 lines of hand-compiled roster data: **109 battles** (68 gyms, 32 Elite Four members, 9 Champions) totaling **428 Pokemon**, each with its National Dex id and canonical typing. Each region is sourced from a single flagship game so the rosters are internally consistent:
 
 | Gen  | Region | Source version       |
 | ---- | ------ | -------------------- |
@@ -66,7 +66,7 @@ Each region carries a `notes` field recording the judgement calls — first-enco
 
 ### Prerequisites
 
-- **Node.js** ≥ 22.20 and **npm** ≥ 10
+- **Node.js** ≥ 20.19 (CI runs 22) and **npm** ≥ 10
 - A modern browser
 
 ### Install
@@ -120,7 +120,8 @@ src/app/
 ├── shared/                      # Reusable, presentational building blocks
 │   ├── pipes/                   # displayName, dexNumber
 │   └── ui/                      # type-badge, sprite-image, pokemon-card,
-│                                #   effectiveness-panel, loader, empty-state
+│                                #   effectiveness-panel, loader, empty-state,
+│                                #   pull-to-refresh
 ├── features/                    # Lazy-loaded route features
 │   ├── home/  dex/  detail/
 │   ├── matchup/                 # Type Matchup Lab
@@ -135,7 +136,7 @@ src/app/
 
 - **Modern Angular fluency** — 100% standalone components, `input()` / `output()` signals, `computed()`/`effect()` state, the `@if`/`@for`/`@switch`/`@let` control flow, `inject()` DI, `withComponentInputBinding()` route inputs, functional interceptors, and lazy `loadComponent` routes with `OnPush` everywhere.
 - **Type-safe domain modeling** — strict TypeScript with explicit models for both the raw API and the app's domain; the entire type-effectiveness engine is pure, unit-testable functions.
-- **Thoughtful async UX** — every data path has loading/skeleton, empty, and error states, an in-memory HTTP cache, and graceful image fallbacks.
+- **Thoughtful async UX** — skeleton/loader and empty states on the data-backed views, an explicit error state with retry on the Dex and the detail page, a capped in-memory HTTP cache, and graceful image fallbacks.
 - **State architecture** — signal-based services with `localStorage` persistence and derived analysis (`computed`), cleanly separated from presentation.
 - **Design craft** — a token-driven SCSS design system (color / spacing / type scale), light + dark themes, a distinctive "battle terminal" aesthetic, tasteful micro-interactions, and full responsiveness.
 - **Accessibility & PWA** — semantic HTML, ARIA states, skip link, keyboard navigation, visible focus, `prefers-reduced-motion` support, and an installable, offline-ready service worker.
