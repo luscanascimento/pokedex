@@ -20,9 +20,7 @@ export class FavoritesService {
   }
 
   toggle(id: number): void {
-    this._ids.update((ids) =>
-      ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
-    );
+    this._ids.update((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
   }
 
   clear(): void {

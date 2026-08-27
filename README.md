@@ -39,26 +39,26 @@ It is built entirely on the modern Angular stack — standalone components, Sign
 
 Build a team, and Poke Arena tells you **which region you could actually beat with it**. Every one of the nine mainline regions is ranked from easiest to hardest for your current squad, right inside the Team Builder.
 
-**Curated data, not an API call.** `src/app/core/data/gym-leaders.ts` is 1422 lines of hand-compiled roster data: **109 battles** (68 gyms, 32 Elite Four members, 9 Champions) totaling **434 Pokemon**, each with its National Dex id and canonical typing. Each region is sourced from a single flagship game so the rosters are internally consistent:
+**Curated data, not an API call.** `src/app/core/data/gym-leaders.ts` is 1422 lines of hand-compiled roster data: **109 battles** (68 gyms, 32 Elite Four members, 9 Champions) totaling **428 Pokemon**, each with its National Dex id and canonical typing. Each region is sourced from a single flagship game so the rosters are internally consistent:
 
-| Gen | Region | Source version |
-| --- | --- | --- |
-| I | Kanto | FireRed/LeafGreen |
-| II | Johto | HeartGold/SoulSilver |
-| III | Hoenn | Emerald |
-| IV | Sinnoh | Platinum |
-| V | Unova | Black 2/White 2 |
-| VI | Kalos | X/Y |
-| VII | Alola | Ultra Sun/Ultra Moon |
-| VIII | Galar | Sword/Shield |
-| IX | Paldea | Scarlet/Violet |
+| Gen  | Region | Source version       |
+| ---- | ------ | -------------------- |
+| I    | Kanto  | FireRed/LeafGreen    |
+| II   | Johto  | HeartGold/SoulSilver |
+| III  | Hoenn  | Emerald              |
+| IV   | Sinnoh | Platinum             |
+| V    | Unova  | Black 2/White 2      |
+| VI   | Kalos  | X/Y                  |
+| VII  | Alola  | Ultra Sun/Ultra Moon |
+| VIII | Galar  | Sword/Shield         |
+| IX   | Paldea | Scarlet/Violet       |
 
-The file header states the rosters were *"compiled and adversarially fact-checked"*, and each region carries a `notes` field recording the judgement calls — first-encounter vs rematch rosters, how version- or starter-dependent teams were resolved, structural oddities (Alola has Island Kahunas instead of gyms; Galar has no Elite Four), and era-correct typings (Kanto's note, for example, records that Mr. Mime is listed as pure Psychic because FR/LG predates the Fairy type). Those notes are rendered in the UI, so the assumptions are visible to the user instead of buried.
+Each region carries a `notes` field recording the judgement calls — first-encounter vs rematch rosters, how version- or starter-dependent teams were resolved, structural oddities (Alola has Island Kahunas instead of gyms; Galar has no Elite Four), and era-correct typings (Kanto's note, for example, records that Mr. Mime is listed as pure Psychic because FR/LG predates the Fairy type). Those notes are rendered in the UI, so the assumptions are visible to the user instead of buried.
 
 **Scoring** (`src/app/core/services/region-readiness.service.ts`, pure functions over the same type chart):
 
 - **Offense 0–100** — the share of the battle's Pokemon that at least one of your members can hit for more than 1× with a STAB type.
-- **Defense 0–100** — the share of the battle's Pokemon whose own STAB does *not* hit at least half your squad for 2× or more.
+- **Defense 0–100** — the share of the battle's Pokemon whose own STAB does _not_ hit at least half your squad for 2× or more.
 - **Battle score** — the mean of the two. A region's score is computed the same way over all of its Pokemon, and the region list is sorted strongest-first.
 - Each region also surfaces its **hardest battle** (lowest score), plus per-Pokemon `covered` / `threat` flags so you can see exactly which mon is the problem.
 

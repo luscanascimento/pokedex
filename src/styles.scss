@@ -142,15 +142,29 @@ body {
   overscroll-behavior-y: contain;
   background-color: var(--bg);
   background-image:
-    radial-gradient(1100px 620px at 88% -8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%),
-    radial-gradient(900px 520px at 4% 8%, color-mix(in srgb, var(--accent-2) 13%, transparent), transparent 55%),
+    radial-gradient(
+      1100px 620px at 88% -8%,
+      color-mix(in srgb, var(--accent) 16%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 520px at 4% 8%,
+      color-mix(in srgb, var(--accent-2) 13%, transparent),
+      transparent 55%
+    ),
     linear-gradient(var(--grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 34px 34px, 34px 34px;
+  background-size:
+    100% 100%,
+    100% 100%,
+    34px 34px,
+    34px 34px;
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  transition: background-color 0.4s var(--ease-out), color 0.3s var(--ease-out);
+  transition:
+    background-color 0.4s var(--ease-out),
+    color 0.3s var(--ease-out);
 }
 
 h1,
@@ -255,7 +269,11 @@ textarea {
   border: 1px solid var(--border-strong);
   background: var(--surface-raised);
   color: var(--text);
-  transition: transform 0.18s var(--ease-spring), background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.18s var(--ease-spring),
+    background 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 /* Only lift on devices with a real hover pointer, so taps don't get stuck
    in the hovered state on touchscreens. */
@@ -272,7 +290,11 @@ textarea {
   border-color: var(--accent);
 }
 .pa-btn--primary {
-  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--accent-3)));
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    color-mix(in srgb, var(--accent) 55%, var(--accent-3))
+  );
   color: #06121a;
   border-color: transparent;
 }

@@ -1,6 +1,16 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, map, of, shareReplay, switchMap } from 'rxjs';
+import {
+  Observable,
+  forkJoin,
+  from,
+  map,
+  mergeMap,
+  of,
+  shareReplay,
+  switchMap,
+  toArray,
+} from 'rxjs';
 
 import {
   ApiListResponse,
@@ -14,10 +24,19 @@ import {
   RawSpecies,
 } from '../models/pokemon.model';
 import { NATIONAL_DEX_MAX, generationForId } from '../data/generations';
+import { clearHttpCache } from '../interceptors/cache.interceptor';
 
 const API = 'https://pokeapi.co/api/v2';
+
 const ARTWORK_BASE =
   'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork';
+
+/**
+ * Max simultaneous detail requests when enriching a page of the dex.
+ * A type filter with no other filter enriches the whole 1025-species index;
+ * unbounded that is 1000+ parallel hits on the free public PokeAPI.
+ */
+export const ENRICH_CONCURRENCY = 6;
 
 const STAT_LABELS: Record<string, string> = {
   hp: 'HP',
@@ -72,25 +91,44 @@ export class PokeApiService {
     return this.index$;
   }
 
-  /** Fetch types for a page of summaries (used to color the cards). */
+  /**
+   * Drop every memoized response so the next read genuinely hits the network.
+   * Backs the Pokedex pull-to-refresh.
+   */
+  refresh(): void {
+    this.index$ = undefined;
+    this.detailCache.clear();
+    clearHttpCache();
+  }
+
+  /**
+   * Fetch types for a page of summaries (used to color the cards).
+   * Returns new summary objects — the inputs are never mutated — and keeps at
+   * most `ENRICH_CONCURRENCY` requests in flight.
+   */
   enrichTypes(summaries: PokemonSummary[]): Observable<PokemonSummary[]> {
     const pending = summaries.filter((s) => s.types.length === 0);
     if (pending.length === 0) {
       return of(summaries);
     }
-    return forkJoin(
-      pending.map((s) =>
-        this.http.get<RawPokemon>(`${API}/pokemon/${s.id}`).pipe(
-          map((raw) => {
-            s.types = raw.types
-              .sort((a, b) => a.slot - b.slot)
-              .map((t) => t.type.name as PokemonTypeName);
-            s.name = raw.name;
-            return s;
-          }),
-        ),
+    return from(pending).pipe(
+      mergeMap(
+        (s) =>
+          this.http.get<RawPokemon>(`${API}/pokemon/${s.id}`).pipe(
+            map<RawPokemon, PokemonSummary>((raw) => ({
+              ...s,
+              name: raw.name,
+              types: this.sortedTypes(raw),
+            })),
+          ),
+        ENRICH_CONCURRENCY,
       ),
-    ).pipe(map(() => summaries));
+      toArray(),
+      map((enriched) => {
+        const byId = new Map(enriched.map((p) => [p.id, p]));
+        return summaries.map((s) => byId.get(s.id) ?? s);
+      }),
+    );
   }
 
   getDetail(idOrName: string | number): Observable<PokemonDetail> {
@@ -126,9 +164,7 @@ export class PokeApiService {
                 id: raw.id,
                 name: raw.name,
                 sprite: `${ARTWORK_BASE}/${raw.id}.png`,
-                types: raw.types
-                  .sort((a, b) => a.slot - b.slot)
-                  .map((t) => t.type.name as PokemonTypeName),
+                types: this.sortedTypes(raw),
                 trigger: st.trigger,
               })),
             ),
@@ -149,12 +185,8 @@ export class PokeApiService {
 
     const levelMoves = raw.moves
       .map((m) => {
-        const detail = m.version_group_details.find(
-          (d) => d.move_learn_method.name === 'level-up',
-        );
-        return detail
-          ? { name: m.move.name, level: detail.level_learned_at }
-          : null;
+        const detail = m.version_group_details.find((d) => d.move_learn_method.name === 'level-up');
+        return detail ? { name: m.move.name, level: detail.level_learned_at } : null;
       })
       .filter((m): m is { name: string; level: number } => m !== null)
       .sort((a, b) => a.level - b.level)
@@ -163,13 +195,11 @@ export class PokeApiService {
     return {
       id: raw.id,
       name: raw.name,
-      types: raw.types
-        .sort((a, b) => a.slot - b.slot)
-        .map((t) => t.type.name as PokemonTypeName),
+      types: this.sortedTypes(raw),
       height: raw.height,
       weight: raw.weight,
       baseExperience: raw.base_experience,
-      abilities: raw.abilities
+      abilities: [...raw.abilities]
         .sort((a, b) => a.slot - b.slot)
         .map((a) => ({ name: a.ability.name, hidden: a.is_hidden })),
       stats,
@@ -178,7 +208,8 @@ export class PokeApiService {
         default: raw.sprites.front_default ?? `${ARTWORK_BASE}/${raw.id}.png`,
         shiny: raw.sprites.front_shiny ?? raw.sprites.front_default ?? '',
         artwork: artwork?.front_default ?? `${ARTWORK_BASE}/${raw.id}.png`,
-        artworkShiny: artwork?.front_shiny ?? artwork?.front_default ?? `${ARTWORK_BASE}/${raw.id}.png`,
+        artworkShiny:
+          artwork?.front_shiny ?? artwork?.front_default ?? `${ARTWORK_BASE}/${raw.id}.png`,
       },
       cry: raw.cries?.latest ?? null,
       moves: levelMoves,
@@ -190,9 +221,7 @@ export class PokeApiService {
     };
   }
 
-  private flattenEvolution(
-    link: RawEvolutionLink,
-  ): { name: string; trigger?: string }[] {
+  private flattenEvolution(link: RawEvolutionLink): { name: string; trigger?: string }[] {
     const out: { name: string; trigger?: string }[] = [];
     const walk = (node: RawEvolutionLink, incomingTrigger?: string): void => {
       out.push({ name: node.species.name, trigger: incomingTrigger });
@@ -210,6 +239,13 @@ export class PokeApiService {
     };
     walk(link);
     return out;
+  }
+
+  /** Slot-ordered type names. Copies first — the raw response is not ours to sort. */
+  private sortedTypes(raw: RawPokemon): PokemonTypeName[] {
+    return [...raw.types]
+      .sort((a, b) => a.slot - b.slot)
+      .map((t) => t.type.name as PokemonTypeName);
   }
 
   private idFromUrl(url: string): number {

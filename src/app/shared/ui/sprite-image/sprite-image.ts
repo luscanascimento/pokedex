@@ -42,7 +42,9 @@ import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core
         height: 100%;
         object-fit: contain;
         opacity: 0;
-        transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out);
+        transition:
+          opacity 0.45s var(--ease-out),
+          transform 0.45s var(--ease-out);
         transform: scale(0.94);
         image-rendering: auto;
       }

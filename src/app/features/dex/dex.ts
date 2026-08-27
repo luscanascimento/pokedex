@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { Subject, catchError, of, takeUntil } from 'rxjs';
 
 import { PokeApiService } from '../../core/services/pokeapi.service';
@@ -22,7 +29,7 @@ const PAGE_SIZE = 36;
   templateUrl: './dex.html',
   styleUrl: './dex.scss',
 })
-export class Dex {
+export class Dex implements OnDestroy {
   private readonly api = inject(PokeApiService);
   private readonly favorites = inject(FavoritesService);
   private readonly team = inject(TeamService);
@@ -116,25 +123,31 @@ export class Dex {
     if (pending.length === 0) {
       return;
     }
-    this.api
-      .enrichTypes(pending)
-      .pipe(
-        catchError(() => of(pending)),
-        takeUntil(this.destroyed$),
-      )
-      .subscribe(() => this.index.update((list) => [...list]));
+    this.enrich(pending);
   }
 
   /** Enrich the full filtered base — needed when a type filter is active. */
   private enrichAll(): void {
-    const base = this.filteredBase();
+    this.enrich(this.filteredBase());
+  }
+
+  private enrich(targets: PokemonSummary[]): void {
     this.api
-      .enrichTypes(base)
+      .enrichTypes(targets)
       .pipe(
-        catchError(() => of(base)),
+        catchError(() => of<PokemonSummary[]>([])),
         takeUntil(this.destroyed$),
       )
-      .subscribe(() => this.index.update((list) => [...list]));
+      .subscribe((enriched) => this.mergeIntoIndex(enriched));
+  }
+
+  /** enrichTypes returns fresh objects, so patch them back into the index by id. */
+  private mergeIntoIndex(enriched: PokemonSummary[]): void {
+    if (enriched.length === 0) {
+      return;
+    }
+    const byId = new Map(enriched.map((p) => [p.id, p]));
+    this.index.update((list) => list.map((p) => byId.get(p.id) ?? p));
   }
 
   protected onSearch(value: string): void {
@@ -185,9 +198,10 @@ export class Dex {
     this.load();
   }
 
-  /** Pull-to-refresh: re-fetch the dex index from the network. */
+  /** Pull-to-refresh: drop the caches and re-fetch the dex index from the network. */
   protected refreshData(): void {
     this.visibleCount.set(PAGE_SIZE);
+    this.api.refresh();
     this.load();
   }
 
@@ -216,9 +230,15 @@ export class Dex {
       this.api
         .enrichTypes([mon])
         .pipe(takeUntil(this.destroyed$))
-        .subscribe(() =>
-          this.team.add({ id: mon.id, name: mon.name, sprite: mon.sprite, types: mon.types }),
-        );
+        .subscribe(([enriched]) => {
+          this.mergeIntoIndex([enriched]);
+          this.team.add({
+            id: enriched.id,
+            name: enriched.name,
+            sprite: enriched.sprite,
+            types: enriched.types,
+          });
+        });
       return;
     }
     this.team.add({ id: mon.id, name: mon.name, sprite: mon.sprite, types: mon.types });

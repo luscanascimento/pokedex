@@ -181,7 +181,10 @@
   background: var(--surface);
   border: 1px solid var(--border);
   overflow: hidden;
-  transition: transform 0.28s var(--ease-spring), border-color 0.28s, box-shadow 0.28s;
+  transition:
+    transform 0.28s var(--ease-spring),
+    border-color 0.28s,
+    box-shadow 0.28s;
   animation: card-in 0.5s var(--ease-out) both;
 }
 @keyframes card-in {

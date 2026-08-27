@@ -8,11 +8,16 @@ import { of, tap } from 'rxjs';
  * layers persistent/offline caching on top in production.
  *
  * Capped so a long browse through the 1025 species can't grow it without bound.
- * ponytail: plain FIFO eviction — insertion-ordered Map, oldest key out. Swap for
- * an LRU only if profiling shows real thrashing on the hot entries.
+ * Plain FIFO eviction — insertion-ordered Map, oldest key out. Swap for an LRU
+ * only if profiling shows real thrashing on the hot entries.
  */
 const MAX_ENTRIES = 300;
 const store = new Map<string, HttpResponse<unknown>>();
+
+/** Drop every cached response (pull-to-refresh, so a reload really reloads). */
+export function clearHttpCache(): void {
+  store.clear();
+}
 
 export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
   if (req.method !== 'GET') {

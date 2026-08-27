@@ -46,7 +46,13 @@
   aspect-ratio: 3 / 4;
 }
 .slot--filled {
-  background: radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--slot-type) 20%, transparent), transparent 60%), var(--surface);
+  background:
+    radial-gradient(
+      120% 80% at 50% 0%,
+      color-mix(in srgb, var(--slot-type) 20%, transparent),
+      transparent 60%
+    ),
+    var(--surface);
   border-color: color-mix(in srgb, var(--slot-type) 34%, transparent);
   animation: slot-in 0.4s var(--ease-spring) both;
 }
@@ -99,7 +105,9 @@
   background: var(--surface-solid);
   color: var(--text-muted);
   font-size: 0.72rem;
-  transition: color 0.2s, border-color 0.2s;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
 }
 .slot__remove:hover {
   color: var(--danger);
@@ -648,7 +656,11 @@
 .mon[data-covered='true'][data-threat='true'] .mon__sprite {
   border-color: var(--danger);
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--success) 30%, transparent) 0 50%, transparent 50%),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--success) 30%, transparent) 0 50%,
+      transparent 50%
+    ),
     color-mix(in srgb, var(--surface-raised) 70%, transparent);
 }
 .mon__name {

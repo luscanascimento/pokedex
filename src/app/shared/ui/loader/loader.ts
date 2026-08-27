@@ -22,7 +22,13 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
         width: 46px;
         height: 46px;
         border-radius: 50%;
-        background: conic-gradient(from 0deg, var(--accent), var(--accent-2), var(--accent-3), var(--accent));
+        background: conic-gradient(
+          from 0deg,
+          var(--accent),
+          var(--accent-2),
+          var(--accent-3),
+          var(--accent)
+        );
         -webkit-mask: radial-gradient(farthest-side, transparent 58%, #000 60%);
         mask: radial-gradient(farthest-side, transparent 58%, #000 60%);
         animation: loader-spin 0.85s linear infinite;

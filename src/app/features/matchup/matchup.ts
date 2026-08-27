@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { Subject, catchError, of, takeUntil } from 'rxjs';
 
 import { PokeApiService } from '../../core/services/pokeapi.service';
@@ -19,7 +26,7 @@ type Mode = 'types' | 'pokemon';
   templateUrl: './matchup.html',
   styleUrl: './matchup.scss',
 })
-export class Matchup {
+export class Matchup implements OnDestroy {
   private readonly api = inject(PokeApiService);
   private readonly destroyed$ = new Subject<void>();
 
@@ -108,8 +115,8 @@ export class Matchup {
         catchError(() => of([summary])),
         takeUntil(this.destroyed$),
       )
-      .subscribe(() => {
-        this.picked.set({ ...summary });
+      .subscribe(([enriched]) => {
+        this.picked.set(enriched);
         this.pickedTypesLoading.set(false);
       });
   }

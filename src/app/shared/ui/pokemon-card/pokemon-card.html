@@ -14,7 +14,9 @@
         [class.icon-btn--active]="isFavorite()"
         (click)="onFavorite($event)"
         [attr.aria-pressed]="isFavorite()"
-        [attr.aria-label]="(isFavorite() ? 'Remove ' : 'Add ') + (pokemon().name | displayName) + ' to favorites'"
+        [attr.aria-label]="
+          (isFavorite() ? 'Remove ' : 'Add ') + (pokemon().name | displayName) + ' to favorites'
+        "
       >
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
           <path
@@ -31,7 +33,9 @@
         [class.icon-btn--active]="inTeam()"
         (click)="onTeam($event)"
         [attr.aria-pressed]="inTeam()"
-        [attr.aria-label]="(inTeam() ? 'Remove ' : 'Add ') + (pokemon().name | displayName) + ' from team'"
+        [attr.aria-label]="
+          (inTeam() ? 'Remove ' : 'Add ') + (pokemon().name | displayName) + ' from team'
+        "
       >
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
           @if (inTeam()) {

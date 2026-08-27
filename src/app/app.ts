@@ -42,7 +42,13 @@ export class App {
   protected readonly nav: NavItem[] = [
     { path: '/dex', label: 'Pokedex', shortLabel: 'Dex', icon: 'dex' },
     { path: '/matchup', label: 'Matchup Lab', shortLabel: 'Matchup', icon: 'matchup' },
-    { path: '/team', label: 'Team Builder', shortLabel: 'Team', icon: 'team', badge: () => this.team.count() },
+    {
+      path: '/team',
+      label: 'Team Builder',
+      shortLabel: 'Team',
+      icon: 'team',
+      badge: () => this.team.count(),
+    },
     {
       path: '/favorites',
       label: 'Favorites',

@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "format": "npx --yes prettier@3.6.2 --write \"src/**/*.{ts,html,scss}\" \"*.{json,md}\"",
+    "format:check": "npx --yes prettier@3.6.2 --check \"src/**/*.{ts,html,scss}\" \"*.{json,md}\""
   },
   "prettier": {
     "printWidth": 100,
@@ -22,11 +24,9 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/cdk": "^20.2.14",
     "@angular/common": "^20.3.0",
     "@angular/compiler": "^20.3.0",
     "@angular/core": "^20.3.0",
-    "@angular/forms": "^20.3.0",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
     "@angular/service-worker": "^20.3.0",

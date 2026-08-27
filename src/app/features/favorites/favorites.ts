@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Subject, catchError, of, takeUntil } from 'rxjs';
 
@@ -19,7 +27,7 @@ type LoadState = 'loading' | 'ready' | 'error';
   templateUrl: './favorites.html',
   styleUrl: './favorites.scss',
 })
-export class Favorites {
+export class Favorites implements OnDestroy {
   private readonly api = inject(PokeApiService);
   private readonly favorites = inject(FavoritesService);
   private readonly team = inject(TeamService);
@@ -61,10 +69,17 @@ export class Favorites {
         this.api
           .enrichTypes(pending)
           .pipe(
-            catchError(() => of(pending)),
+            catchError(() => of<PokemonSummary[]>([])),
             takeUntil(this.destroyed$),
           )
-          .subscribe(() => this.index.update((list) => [...list]));
+          .subscribe((enriched) => {
+            if (enriched.length === 0) {
+              return;
+            }
+            // enrichTypes returns fresh objects — patch them back in by id.
+            const byId = new Map(enriched.map((p) => [p.id, p]));
+            this.index.update((list) => list.map((p) => byId.get(p.id) ?? p));
+          });
       }
     });
   }

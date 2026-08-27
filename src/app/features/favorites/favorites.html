@@ -13,7 +13,10 @@
     <pa-loader label="Loading favorites" />
   }
   @case ('error') {
-    <pa-empty-state title="Couldn't load favorites" message="We couldn't reach PokeAPI to hydrate your saved Pokemon." />
+    <pa-empty-state
+      title="Couldn't load favorites"
+      message="We couldn't reach PokeAPI to hydrate your saved Pokemon."
+    />
   }
   @case ('ready') {
     @if (favorites$().length === 0) {

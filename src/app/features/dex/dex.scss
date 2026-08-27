@@ -60,7 +60,9 @@
   color: var(--text);
   font-family: var(--font-sans);
   font-size: var(--fs-base);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 .search__input::placeholder {
   color: var(--text-dim);
@@ -137,7 +139,11 @@
   border: 1px solid var(--border);
   background: var(--surface-raised);
   color: var(--text-muted);
-  transition: transform 0.16s var(--ease-spring), border-color 0.2s, color 0.2s, background 0.2s;
+  transition:
+    transform 0.16s var(--ease-spring),
+    border-color 0.2s,
+    color 0.2s,
+    background 0.2s;
 }
 @media (hover: hover) {
   .chip:hover {

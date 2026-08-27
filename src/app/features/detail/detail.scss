@@ -10,7 +10,9 @@
   font-size: var(--fs-sm);
   color: var(--text-muted);
   margin-bottom: var(--space-5);
-  transition: color 0.2s, transform 0.2s;
+  transition:
+    color 0.2s,
+    transform 0.2s;
 }
 .back-link:hover {
   color: var(--accent);
@@ -29,8 +31,16 @@
   border: 1px solid var(--border);
   overflow: hidden;
   background:
-    radial-gradient(120% 90% at 20% 0%, color-mix(in srgb, var(--mon-type) 22%, transparent), transparent 55%),
-    radial-gradient(120% 90% at 90% 100%, color-mix(in srgb, var(--mon-type-2) 18%, transparent), transparent 55%),
+    radial-gradient(
+      120% 90% at 20% 0%,
+      color-mix(in srgb, var(--mon-type) 22%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      120% 90% at 90% 100%,
+      color-mix(in srgb, var(--mon-type-2) 18%, transparent),
+      transparent 55%
+    ),
     var(--surface);
 }
 
@@ -67,7 +77,11 @@
   position: absolute;
   inset: 8%;
   border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--mon-type) 40%, transparent), transparent 68%);
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--mon-type) 40%, transparent),
+    transparent 68%
+  );
   filter: blur(6px);
   animation: pulse-glow 4s ease-in-out infinite;
 }
@@ -99,7 +113,10 @@
   border: 1px solid var(--border-strong);
   background: var(--surface-solid);
   color: var(--text-muted);
-  transition: color 0.2s, border-color 0.2s, transform 0.18s var(--ease-spring);
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    transform 0.18s var(--ease-spring);
 }
 .shiny-toggle:hover {
   transform: scale(1.05);
@@ -339,8 +356,16 @@
   padding: var(--space-3);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  background: radial-gradient(110% 80% at 50% 0%, color-mix(in srgb, var(--evo-type) 18%, transparent), transparent 60%), var(--surface-raised);
-  transition: transform 0.24s var(--ease-spring), border-color 0.24s;
+  background:
+    radial-gradient(
+      110% 80% at 50% 0%,
+      color-mix(in srgb, var(--evo-type) 18%, transparent),
+      transparent 60%
+    ),
+    var(--surface-raised);
+  transition:
+    transform 0.24s var(--ease-spring),
+    border-color 0.24s;
   width: 130px;
 }
 .evo__mon:hover {

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Subject, catchError, of, takeUntil } from 'rxjs';
@@ -32,7 +39,7 @@ import { DexNumberPipe } from '../../shared/pipes/dex-number.pipe';
   templateUrl: './team.html',
   styleUrl: './team.scss',
 })
-export class Team {
+export class Team implements OnDestroy {
   private readonly api = inject(PokeApiService);
   private readonly team = inject(TeamService);
   private readonly readiness = inject(RegionReadinessService);
@@ -140,12 +147,12 @@ export class Team {
         catchError(() => of([summary])),
         takeUntil(this.destroyed$),
       )
-      .subscribe(() => {
+      .subscribe(([enriched]) => {
         this.team.add({
-          id: summary.id,
-          name: summary.name,
-          sprite: summary.sprite,
-          types: summary.types,
+          id: enriched.id,
+          name: enriched.name,
+          sprite: enriched.sprite,
+          types: enriched.types,
         });
         this.adding.set(false);
       });

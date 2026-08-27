@@ -15,6 +15,19 @@ describe('RegionReadinessService', () => {
     expect(service.rankRegions([])).toEqual([]);
   });
 
+  // The README quotes these totals. Keep them in step with the data.
+  it('carries the roster totals the README advertises', () => {
+    const battles = REGION_ROSTERS.flatMap((r) => r.battles);
+    const byRole = (role: string) => battles.filter((b) => b.role === role).length;
+
+    expect(REGION_ROSTERS.length).toBe(9);
+    expect(battles.length).toBe(109);
+    expect(byRole('gym')).toBe(68);
+    expect(byRole('elite-four')).toBe(32);
+    expect(byRole('champion')).toBe(9);
+    expect(battles.reduce((n, b) => n + b.team.length, 0)).toBe(428);
+  });
+
   describe('with a real team', () => {
     const team = [
       member(6, 'Charizard', 'fire', 'flying'),

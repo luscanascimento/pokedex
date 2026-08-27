@@ -2,8 +2,8 @@ import { PokemonTypeName } from '../models/pokemon.model';
 
 /**
  * Canonical gym-leader, Elite Four and Champion rosters for all nine regions.
- * Sourced from each region's flagship mainline game (see `version`), compiled and
- * adversarially fact-checked. Used by the Team Builder's Region Readiness analysis.
+ * Sourced from each region's flagship mainline game (see `version`).
+ * Used by the Team Builder's Region Readiness analysis.
  */
 
 export type BattleRole = 'gym' | 'elite-four' | 'champion';
@@ -35,8 +35,7 @@ export interface RegionRoster {
 }
 
 /** Small pixel sprite for a leader's Pokemon by National Dex id. */
-const SPRITE_BASE =
-  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+const SPRITE_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 
 export function leaderSprite(dexId: number): string {
   return `${SPRITE_BASE}/${dexId}.png`;
@@ -48,7 +47,7 @@ export const REGION_ROSTERS: RegionRoster[] = [
     region: 'Kanto',
     version: 'FireRed/LeafGreen',
     notes:
-      'Teams reflect the main-story (first) battles. Blaine\'s Vulpix/Growlithe and Blue\'s starter/Eeveelutions depend on version and player starter choice; the Charizard-line variant of Blue\'s team is shown. Elite Four and Champion teams are the pre-National-Dex (first challenge) rosters. Mr. Mime\'s typing corrected to pure Psychic: FR/LG is Gen 3, where the Fairy type did not yet exist.',
+      "Teams reflect the main-story (first) battles. Blaine's Vulpix/Growlithe and Blue's starter/Eeveelutions depend on version and player starter choice; the Charizard-line variant of Blue's team is shown. Elite Four and Champion teams are the pre-National-Dex (first challenge) rosters. Mr. Mime is listed as pure Psychic: FR/LG is Gen 3, where the Fairy type did not yet exist.",
     battles: [
       {
         leader: 'Brock',
@@ -375,7 +374,7 @@ export const REGION_ROSTERS: RegionRoster[] = [
     region: 'Hoenn',
     version: 'Emerald',
     notes:
-      'Emerald-specific rosters. Tate & Liza is a double battle (Mossdeep Gym). Juan replaces Wallace as the 8th gym leader (Sootopolis) since Wallace is the Champion in Emerald. Verified: all dexIds, typings, battles, and specialties are correct; no changes needed.',
+      'Emerald-specific rosters. Tate & Liza is a double battle (Mossdeep Gym). Juan replaces Wallace as the 8th gym leader (Sootopolis) since Wallace is the Champion in Emerald.',
     battles: [
       {
         leader: 'Roxanne',
@@ -711,7 +710,7 @@ export const REGION_ROSTERS: RegionRoster[] = [
     region: 'Unova',
     version: 'Black 2/White 2',
     notes:
-      'Verified against Pokemon Black 2/White 2 first-battle story rosters. All dexIds match their species and all typings are canonical (Gen 5 typings; no retroactive Fairy re-typings apply to these species). All 8 gym leaders (Cheren, Roxie, Burgh, Elesa, Clay, Skyla, Drayden, Marlon), the 4 Elite Four (Shauntal, Grimsley, Caitlin, Marshal), and Champion Iris are present. No corrections were needed; the original roster was already accurate. Note: this is the B2W2 League roster where Iris is Champion (in BW the initial Champion was Alder). Gym leader partial teams reflect the smaller first-visit rosters.',
+      'Teams reflect Pokemon Black 2/White 2 first-battle story rosters, with Gen 5 typings (no retroactive Fairy re-typings apply to these species). This is the B2W2 League roster where Iris is Champion (in BW the initial Champion was Alder). Gym leader partial teams reflect the smaller first-visit rosters.',
     battles: [
       {
         leader: 'Cheren',
@@ -868,7 +867,7 @@ export const REGION_ROSTERS: RegionRoster[] = [
     region: 'Kalos',
     version: 'X/Y',
     notes:
-      'Story-mode first-encounter teams from Pokemon X and Y. Teams are identical between X and Y for all gym leaders, Elite Four, and Champion. All entries verified correct against National Dex data.',
+      'Story-mode first-encounter teams from Pokemon X and Y. Teams are identical between X and Y for all gym leaders, Elite Four, and Champion.',
     battles: [
       {
         leader: 'Viola',
@@ -1024,7 +1023,7 @@ export const REGION_ROSTERS: RegionRoster[] = [
     region: 'Alola',
     version: 'Ultra Sun/Ultra Moon',
     notes:
-      'Alola has no Pokemon Gyms. The island challenge replaces them: trainers complete Trials and battle the four Island Kahunas (grand trials). The Kahunas (Hala, Olivia, Nanu, Hapu) are listed here as the gym-equivalent battles with role:"gym". Olivia serves as both a Kahuna (Akala Island) and an Elite Four member, so she appears twice. In USUM the Champion is Professor Kukui, who has no single type specialty. Correction: Kukui\'s Ninetales is the Alolan form (Ice/Fairy), not the Kantonian Fire form.',
+      'Alola has no Pokemon Gyms. The island challenge replaces them: trainers complete Trials and battle the four Island Kahunas (grand trials). The Kahunas (Hala, Olivia, Nanu, Hapu) are listed here as the gym-equivalent battles with role:"gym". Olivia serves as both a Kahuna (Akala Island) and an Elite Four member, so she appears twice. In USUM the Champion is Professor Kukui, who has no single type specialty. Kukui\'s Ninetales is the Alolan form (Ice/Fairy), not the Kantonian Fire form.',
     battles: [
       {
         leader: 'Hala',
@@ -1051,7 +1050,7 @@ export const REGION_ROSTERS: RegionRoster[] = [
       {
         leader: 'Nanu',
         role: 'gym',
-        label: 'Ula\'ula Grand Trial',
+        label: "Ula'ula Grand Trial",
         specialtyType: 'dark',
         team: [
           { name: 'Sableye', dexId: 302, types: ['dark', 'ghost'] },
@@ -1143,7 +1142,7 @@ export const REGION_ROSTERS: RegionRoster[] = [
     region: 'Galar',
     version: 'Sword/Shield',
     notes:
-      'Galar has NO Elite Four; after the 8 gyms the player competes in the Champion Cup, and Leon is treated here as the Champion (role: champion). Version exclusives: Bea (Fighting) is the 4th gym leader in Sword while Allister (Ghost) takes her place in Shield; Gordie (Rock) is the 6th gym leader in Sword while Melony (Ice) takes his place in Shield. Per instructions, Bea (Sword) is used for the 4th gym and Melony (Shield) for the 6th gym. Allister (Ghost) and Gordie (Rock) are the noted alternates. Melony\'s Darmanitan is Galarian (pure Ice). Teams shown are the story-mode gym-mission teams (not the tougher post-game Champion Cup rematch/Ranked teams). Each leader Dynamaxes their final Pokemon in-game. Verification result: all dexIds, typings, teams, and roster completeness were already correct; returned unchanged. Opal (Fairy, Ballonlea) added as the 5th gym.',
+      "Galar has NO Elite Four; after the 8 gyms the player competes in the Champion Cup, and Leon is treated here as the Champion (role: champion). Version exclusives: Bea (Fighting) is the 4th gym leader in Sword while Allister (Ghost) takes her place in Shield; Gordie (Rock) is the 6th gym leader in Sword while Melony (Ice) takes his place in Shield. Bea (Sword) is used for the 4th gym and Melony (Shield) for the 6th gym. Allister (Ghost) and Gordie (Rock) are the noted alternates. Melony's Darmanitan is Galarian (pure Ice). Teams shown are the story-mode gym-mission teams (not the tougher post-game Champion Cup rematch/Ranked teams). Each leader Dynamaxes their final Pokemon in-game. Opal (Fairy) leads the 5th gym in Ballonlea.",
     battles: [
       {
         leader: 'Milo',
@@ -1185,7 +1184,7 @@ export const REGION_ROSTERS: RegionRoster[] = [
         team: [
           { name: 'Hitmontop', dexId: 237, types: ['fighting'] },
           { name: 'Pangoro', dexId: 675, types: ['fighting', 'dark'] },
-          { name: 'Sirfetch\'d', dexId: 865, types: ['fighting'] },
+          { name: "Sirfetch'd", dexId: 865, types: ['fighting'] },
           { name: 'Machamp', dexId: 68, types: ['fighting'] },
         ],
       },
@@ -1257,7 +1256,7 @@ export const REGION_ROSTERS: RegionRoster[] = [
     region: 'Paldea',
     version: 'Scarlet/Violet',
     notes:
-      'Victory Road story-mode main teams (level-scaled, pre-rematch). Larry appears twice: as the Normal-type Medali Gym Leader and as the Flying-type Elite Four member. No version-exclusive gym leaders in the main gym challenge. All dex IDs and typings verified correct; roster unchanged.',
+      'Victory Road story-mode main teams (level-scaled, pre-rematch). Larry appears twice: as the Normal-type Medali Gym Leader and as the Flying-type Elite Four member. No version-exclusive gym leaders in the main gym challenge.',
     battles: [
       {
         leader: 'Katy',

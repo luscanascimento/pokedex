@@ -83,9 +83,7 @@ export class RegionReadinessService {
     const score = (offense + defense) / 2;
 
     const hardestBattle =
-      battles.length > 0
-        ? battles.reduce((worst, b) => (b.score < worst.score ? b : worst))
-        : null;
+      battles.length > 0 ? battles.reduce((worst, b) => (b.score < worst.score ? b : worst)) : null;
 
     return {
       gen: region.gen,

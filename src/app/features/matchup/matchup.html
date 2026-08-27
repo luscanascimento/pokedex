@@ -93,7 +93,12 @@
               }
             </div>
           </div>
-          <button type="button" class="picked__clear" (click)="clearPick()" aria-label="Clear selection">
+          <button
+            type="button"
+            class="picked__clear"
+            (click)="clearPick()"
+            aria-label="Clear selection"
+          >
             ✕
           </button>
         </div>
@@ -117,10 +122,17 @@
       <div class="result-empty">
         <div class="result-empty__icon" aria-hidden="true">
           <svg viewBox="0 0 48 48" width="44" height="44">
-            <path d="M24 4l6 14 14 6-14 6-6 14-6-14-14-6 14-6z" fill="none" stroke="currentColor" stroke-width="2" />
+            <path
+              d="M24 4l6 14 14 6-14 6-6 14-6-14-14-6 14-6z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            />
           </svg>
         </div>
-        <p>Select {{ mode() === 'types' ? 'a type' : 'a Pokemon' }} to see the matchup breakdown.</p>
+        <p>
+          Select {{ mode() === 'types' ? 'a type' : 'a Pokemon' }} to see the matchup breakdown.
+        </p>
       </div>
     }
   </section>

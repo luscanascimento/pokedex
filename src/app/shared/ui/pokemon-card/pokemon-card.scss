@@ -9,7 +9,11 @@
   padding: var(--space-4);
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(120% 80% at 50% -10%, color-mix(in srgb, var(--card-type) 18%, transparent), transparent 60%),
+    radial-gradient(
+      120% 80% at 50% -10%,
+      color-mix(in srgb, var(--card-type) 18%, transparent),
+      transparent 60%
+    ),
     var(--surface);
   border: 1px solid var(--border);
   overflow: hidden;
@@ -34,8 +38,14 @@
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(150deg, color-mix(in srgb, var(--card-type) 55%, transparent), transparent 45%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--card-type) 55%, transparent),
+    transparent 45%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0;
@@ -76,7 +86,11 @@
   right: -30%;
   width: 70%;
   height: 70%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--card-type) 45%, transparent), transparent 70%);
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--card-type) 45%, transparent),
+    transparent 70%
+  );
   filter: blur(30px);
   opacity: 0.5;
   z-index: -1;
@@ -110,7 +124,11 @@
   background: var(--surface-raised);
   color: var(--text-dim);
   -webkit-tap-highlight-color: transparent;
-  transition: color 0.2s, border-color 0.2s, transform 0.18s var(--ease-spring), background 0.2s;
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    transform 0.18s var(--ease-spring),
+    background 0.2s;
 }
 /* Enlarge the tappable area to >= 44px without changing the visual size,
    using an invisible padded hit-box. */
@@ -151,8 +169,14 @@
   position: absolute;
   inset: 12%;
   border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--card-type) 26%, transparent), transparent 68%);
-  transition: transform 0.35s var(--ease-out), opacity 0.35s var(--ease-out);
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--card-type) 26%, transparent),
+    transparent 68%
+  );
+  transition:
+    transform 0.35s var(--ease-out),
+    opacity 0.35s var(--ease-out);
   opacity: 0.6;
   z-index: 0;
 }

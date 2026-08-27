@@ -34,7 +34,9 @@
   border: none;
   background: transparent;
   color: var(--text-muted);
-  transition: color 0.2s, background 0.2s;
+  transition:
+    color 0.2s,
+    background 0.2s;
 }
 .mode-switch__btn--active {
   color: #06121a;
@@ -78,7 +80,11 @@
   border: 1px solid var(--border);
   background: var(--surface-raised);
   color: var(--text-muted);
-  transition: transform 0.16s var(--ease-spring), border-color 0.2s, color 0.2s, background 0.2s;
+  transition:
+    transform 0.16s var(--ease-spring),
+    border-color 0.2s,
+    color 0.2s,
+    background 0.2s;
 }
 .type-picker__btn:hover {
   transform: translateY(-2px);
@@ -158,7 +164,13 @@
   padding: var(--space-4);
   border-radius: var(--radius-md);
   border: 1px solid color-mix(in srgb, var(--picked-type) 40%, transparent);
-  background: radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--picked-type) 20%, transparent), transparent 60%), var(--surface-raised);
+  background:
+    radial-gradient(
+      120% 90% at 0% 0%,
+      color-mix(in srgb, var(--picked-type) 20%, transparent),
+      transparent 60%
+    ),
+    var(--surface-raised);
 }
 .picked__sprite {
   width: 80px;

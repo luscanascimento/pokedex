@@ -23,12 +23,7 @@
       aria-label="Search Pokemon"
     />
     @if (query()) {
-      <button
-        type="button"
-        class="search__clear"
-        (click)="onSearch('')"
-        aria-label="Clear search"
-      >
+      <button type="button" class="search__clear" (click)="onSearch('')" aria-label="Clear search">
         ✕
       </button>
     }
@@ -115,9 +110,7 @@
           <div class="load-more">
             <button type="button" class="pa-btn" (click)="loadMore()">
               Load more
-              <span class="load-more__count"
-                >{{ visible().length }} / {{ resultCount() }}</span
-              >
+              <span class="load-more__count">{{ visible().length }} / {{ resultCount() }}</span>
             </button>
           </div>
         }

@@ -7,8 +7,6 @@ export class DisplayNamePipe implements PipeTransform {
     if (!value) {
       return '';
     }
-    return value
-      .replace(/-/g, ' ')
-      .replace(/\b\w/g, (c) => c.toUpperCase());
+    return value.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   }
 }

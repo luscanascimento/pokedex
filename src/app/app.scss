@@ -113,7 +113,9 @@
   font-weight: 500;
   font-size: var(--fs-sm);
   color: var(--text-muted);
-  transition: color 0.2s, background 0.2s;
+  transition:
+    color 0.2s,
+    background 0.2s;
 }
 .nav__link:hover {
   color: var(--text);
@@ -153,7 +155,10 @@
   border: 1px solid var(--border);
   background: var(--surface-raised);
   color: var(--text);
-  transition: transform 0.3s var(--ease-spring), border-color 0.2s, color 0.2s;
+  transition:
+    transform 0.3s var(--ease-spring),
+    border-color 0.2s,
+    color 0.2s;
 }
 .theme-toggle:hover {
   transform: rotate(18deg) scale(1.06);
@@ -172,9 +177,7 @@
   width: 100%;
   max-width: 1240px;
   margin: 0 auto;
-  padding: var(--space-6)
-    max(var(--space-5), env(safe-area-inset-right))
-    var(--space-8)
+  padding: var(--space-6) max(var(--space-5), env(safe-area-inset-right)) var(--space-8)
     max(var(--space-5), env(safe-area-inset-left));
 }
 
@@ -242,8 +245,8 @@
     justify-content: space-around;
     align-items: stretch;
     gap: 2px;
-    padding: 6px max(6px, env(safe-area-inset-right))
-      max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+    padding: 6px max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom))
+      max(6px, env(safe-area-inset-left));
     background: color-mix(in srgb, var(--bg) 88%, transparent);
     backdrop-filter: blur(18px);
     border-top: 1px solid var(--border);
@@ -266,7 +269,9 @@
     font-family: var(--font-display);
     font-weight: 600;
     -webkit-tap-highlight-color: transparent;
-    transition: color 0.18s var(--ease-out), background 0.18s var(--ease-out),
+    transition:
+      color 0.18s var(--ease-out),
+      background 0.18s var(--ease-out),
       transform 0.12s var(--ease-out);
   }
   .tab-bar__item:active {

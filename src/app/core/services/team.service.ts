@@ -83,9 +83,7 @@ export class TeamService {
       .filter((r) => r.weakCount > 0)
       .sort((a, b) => b.weakCount - a.weakCount || a.type.localeCompare(b.type));
 
-    const uncovered = rows
-      .filter((r) => r.resistCount === 0 && r.weakCount > 0)
-      .map((r) => r.type);
+    const uncovered = rows.filter((r) => r.resistCount === 0 && r.weakCount > 0).map((r) => r.type);
 
     const resisted = rows
       .filter((r) => r.resistCount > 0)
