@@ -32,6 +32,11 @@ export interface ApiListResponse {
   results: NamedApiResource[];
 }
 
+/** `/type/{name}`: every Pokemon of a type, in a single response. */
+export interface RawTypeMembers {
+  pokemon: { pokemon: NamedApiResource; slot: number }[];
+}
+
 /** Lightweight card representation used across the grid. */
 export interface PokemonSummary {
   id: number;

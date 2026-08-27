@@ -46,6 +46,8 @@ export class Dex implements OnDestroy {
   protected readonly query = signal('');
   protected readonly typeFilter = signal<PokemonTypeName | null>(null);
   protected readonly genFilter = signal<number | null>(null);
+  /** Dex ids of the active type, from `/type/{name}`. Null while unresolved. */
+  private readonly typeMemberIds = signal<Set<number> | null>(null);
   protected readonly visibleCount = signal(PAGE_SIZE);
 
   protected readonly favoriteIds = this.favorites.ids;
@@ -70,14 +72,14 @@ export class Dex implements OnDestroy {
     });
   });
 
-  /** Type filter requires enriched types. */
+  /** Type filter is resolved from the type endpoint, not from enriched cards. */
   protected readonly filtered = computed(() => {
-    const type = this.typeFilter();
     const base = this.filteredBase();
-    if (!type) {
+    if (!this.typeFilter()) {
       return base;
     }
-    return base.filter((p) => p.types.includes(type));
+    const ids = this.typeMemberIds();
+    return ids ? base.filter((p) => ids.has(p.id)) : [];
   });
 
   protected readonly visible = computed(() => this.filtered().slice(0, this.visibleCount()));
@@ -116,19 +118,13 @@ export class Dex implements OnDestroy {
       });
   }
 
-  /** Enrich types for the visible slice so cards render colors + can be filtered. */
+  /** Enrich types for the rendered slice only, so cards get their colors. */
   private enrichVisible(): void {
-    const slice = this.filteredBase().slice(0, this.visibleCount());
-    const pending = slice.filter((s) => s.types.length === 0);
+    const pending = this.visible().filter((s) => s.types.length === 0);
     if (pending.length === 0) {
       return;
     }
     this.enrich(pending);
-  }
-
-  /** Enrich the full filtered base — needed when a type filter is active. */
-  private enrichAll(): void {
-    this.enrich(this.filteredBase());
   }
 
   private enrich(targets: PokemonSummary[]): void {
@@ -153,31 +149,38 @@ export class Dex implements OnDestroy {
   protected onSearch(value: string): void {
     this.query.set(value);
     this.visibleCount.set(PAGE_SIZE);
-    if (this.typeFilter()) {
-      this.enrichAll();
-    } else {
-      this.enrichVisible();
-    }
+    this.enrichVisible();
   }
 
   protected setType(type: PokemonTypeName | null): void {
-    this.typeFilter.set(this.typeFilter() === type ? null : type);
+    const next = this.typeFilter() === type ? null : type;
+    this.typeFilter.set(next);
+    this.typeMemberIds.set(null);
     this.visibleCount.set(PAGE_SIZE);
-    if (this.typeFilter()) {
-      this.enrichAll();
-    } else {
+    if (!next) {
       this.enrichVisible();
+      return;
     }
+    // Skeletons, not the empty state: `filtered()` is legitimately empty until
+    // the type members land.
+    this.state.set('loading');
+    this.api
+      .getTypeMembers(next)
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe({
+        next: (ids) => {
+          this.typeMemberIds.set(ids);
+          this.state.set('ready');
+          this.enrichVisible();
+        },
+        error: () => this.state.set('error'),
+      });
   }
 
   protected setGen(gen: number | null): void {
     this.genFilter.set(this.genFilter() === gen ? null : gen);
     this.visibleCount.set(PAGE_SIZE);
-    if (this.typeFilter()) {
-      this.enrichAll();
-    } else {
-      this.enrichVisible();
-    }
+    this.enrichVisible();
   }
 
   protected loadMore(): void {
@@ -188,6 +191,7 @@ export class Dex implements OnDestroy {
   protected clearFilters(): void {
     this.query.set('');
     this.typeFilter.set(null);
+    this.typeMemberIds.set(null);
     this.genFilter.set(null);
     this.visibleCount.set(PAGE_SIZE);
     this.enrichVisible();

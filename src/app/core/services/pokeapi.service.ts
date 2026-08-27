@@ -22,6 +22,7 @@ import {
   RawEvolutionLink,
   RawPokemon,
   RawSpecies,
+  RawTypeMembers,
 } from '../models/pokemon.model';
 import { NATIONAL_DEX_MAX, generationForId } from '../data/generations';
 import { clearHttpCache } from '../interceptors/cache.interceptor';
@@ -33,8 +34,8 @@ const ARTWORK_BASE =
 
 /**
  * Max simultaneous detail requests when enriching a page of the dex.
- * A type filter with no other filter enriches the whole 1025-species index;
- * unbounded that is 1000+ parallel hits on the free public PokeAPI.
+ * A page is 36 cards; unbounded that is 36 parallel hits on the free public
+ * PokeAPI every time the user scrolls.
  */
 export const ENRICH_CONCURRENCY = 6;
 
@@ -127,6 +128,28 @@ export class PokeApiService {
       map((enriched) => {
         const byId = new Map(enriched.map((p) => [p.id, p]));
         return summaries.map((s) => byId.get(s.id) ?? s);
+      }),
+    );
+  }
+
+  /**
+   * National Dex ids belonging to a type, in ONE request.
+   * The alternative — reading `types` off every summary — costs 1025 detail
+   * calls before the grid can render a single card.
+   * Alternate forms come back with ids above the National Dex range; drop them
+   * so the ids line up with the index.
+   */
+  getTypeMembers(type: PokemonTypeName): Observable<Set<number>> {
+    return this.http.get<RawTypeMembers>(`${API}/type/${type}`).pipe(
+      map((res) => {
+        const ids = new Set<number>();
+        for (const entry of res.pokemon) {
+          const id = this.idFromUrl(entry.pokemon.url);
+          if (id > 0 && id <= NATIONAL_DEX_MAX) {
+            ids.add(id);
+          }
+        }
+        return ids;
       }),
     );
   }
